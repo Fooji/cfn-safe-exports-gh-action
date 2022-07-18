@@ -1,0 +1,1 @@
+# cfn-safe-exports-gh-action
