@@ -19,11 +19,4 @@ Just `npm run build`, commit and tag
     AWS_REGION: us-west-1
 ```
 
-This will, if successfull, create the environment variables using the uppercase + snakecase convention:
-
-```
-FOOJI_STAGE
-FOOJI_ENV
-```
-
 The AWS env variables are only required if we need to actually set them. Depends on how the credentials are setup.
