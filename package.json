@@ -1,0 +1,33 @@
+{
+  "name": "cfn-safe-exports-gh-action",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test/*.js",
+    "build": "npx ncc build index.js --license licenses.txt"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Fooji/cfn-safe-exports-gh-action.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Fooji/cfn-safe-exports-gh-action/issues"
+  },
+  "homepage": "https://github.com/Fooji/cfn-safe-exports-gh-action#readme",
+  "dependencies": {
+    "@actions/core": "^1.9.0",
+    "aws-sdk": "^2.1176.0",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "@vercel/ncc": "^0.34.0",
+    "chai": "^4.3.6",
+    "mocha": "^10.0.0",
+    "sinon": "^14.0.0",
+    "sinon-chai": "^3.7.0"
+  }
+}
