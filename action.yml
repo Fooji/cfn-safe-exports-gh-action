@@ -1,0 +1,9 @@
+name: 'cfn-safe-exports-gh-action'
+description: 'Fetch cloudformation exports checking for availability'
+inputs:
+  exports:
+    description: 'List of exports to fetch'
+    required: true
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
