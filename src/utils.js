@@ -1,6 +1,7 @@
 const core = require('@actions/core')
 const difference = require('lodash/difference')
 const cloudformation = require('./cloudformation')
+const listExportsCommand = require('./listExportsCommand')
 
 const processInput = (inputExports) => {
   return inputExports
@@ -36,8 +37,8 @@ const getMissingExports = (exportMap, inputExports) => {
 }
 
 const fetchExports = async (inputExports, previousResult = {}, nextToken) => {
-  const { Exports, NextToken } = await cloudformation.listExports({ NextToken: nextToken }).promise()
-
+  const command = listExportsCommand.getListExportsCommand(nextToken)
+  const { Exports, NextToken } = await cloudformation.send(command)
   const result = Exports.reduce((acc, { Name, Value }) => {
     if (inputExports.includes(Name)) {
       acc[Name] = Value

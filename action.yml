@@ -5,5 +5,5 @@ inputs:
     description: 'List of exports to fetch'
     required: true
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'
