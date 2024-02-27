@@ -3,6 +3,8 @@ const chai = require('chai')
 const sinonChai = require('sinon-chai')
 const core = require('@actions/core')
 const cloudformation = require('../src/cloudformation')
+const listExportsCommand = require('../src/listExportsCommand')
+const { ListExportsCommand } = require('@aws-sdk/client-cloudformation')
 const {
   processInput,
   fetchExports,
@@ -66,40 +68,40 @@ describe('Utils', () => {
   })
 
   describe('#fetchExports', () => {
-    let cfListExportsStub, inputExports
+    let cfSendCommandStub, inputExports, getListExportsCommandStub
 
     beforeEach(() => {
-      cfListExportsStub = sandbox.stub(cloudformation, 'listExports')
+      cfSendCommandStub = sandbox.stub(cloudformation, 'send')
+      getListExportsCommandStub = sandbox.stub(listExportsCommand, 'getListExportsCommand')
 
       inputExports = ['foo', 'bar']
     })
 
     it('returns export map for found requested exports', async () => {
-      cfListExportsStub.returns({
-        promise: () =>
-          Promise.resolve({ Exports: [{ Name: 'foo', Value: 'fooVal' }, { Name: 'boo', Value: 'booVal' }] })
-      })
+      getListExportsCommandStub.returns(sandbox.createStubInstance(ListExportsCommand))
+      cfSendCommandStub.resolves({ Exports: [{ Name: 'foo', Value: 'fooVal' }, { Name: 'boo', Value: 'booVal' }] })
 
       expect(await fetchExports(inputExports)).to.deep.equal({ foo: 'fooVal' })
     })
 
     context('when there are more pages', () => {
       beforeEach(() => {
-        cfListExportsStub
-          .withArgs({ NextToken: undefined })
-          .returns({
-            promise: () =>
-              Promise.resolve({ Exports: [{ Name: 'foo', Value: 'fooVal' }], NextToken: 'next' })
-          })
+        const listExportsCommandWithNextTokenUndefined = new ListExportsCommand({ NextToken: undefined })
+        getListExportsCommandStub.withArgs(undefined).returns(listExportsCommandWithNextTokenUndefined)
+        cfSendCommandStub
+          .withArgs(listExportsCommandWithNextTokenUndefined)
+          .resolves({ Exports: [{ Name: 'foo', Value: 'fooVal' }], NextToken: 'next' })
 
-        cfListExportsStub
-          .withArgs({ NextToken: 'next' })
-          .returns({ promise: () => Promise.resolve({ Exports: [{ Name: 'bar', Value: 'barVal' }] }) })
+          const listExportsCommandWithNextTokenNext = new ListExportsCommand({ NextToken: 'next' })
+        getListExportsCommandStub.withArgs('next').returns(listExportsCommandWithNextTokenNext)
+        cfSendCommandStub
+          .withArgs(listExportsCommandWithNextTokenNext)
+          .resolves({ Exports: [{ Name: 'bar', Value: 'barVal' }] })
       })
 
       it('fetches next page', async () => {
         await fetchExports(inputExports)
-        return expect(cfListExportsStub).to.have.been.calledTwice
+        return expect(cfSendCommandStub).to.have.been.calledTwice
       })
 
       it('returns mapped exports from both pages', async () => {

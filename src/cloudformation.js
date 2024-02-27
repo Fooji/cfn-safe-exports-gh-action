@@ -1,5 +1,5 @@
-const { CloudFormation } = require('aws-sdk')
+const { CloudFormationClient } = require("@aws-sdk/client-cloudformation")
 
-const cloudformation = new CloudFormation({ apiVersion: '2010-05-15' })
+const cloudformation = new CloudFormationClient()
 
 module.exports = cloudformation
